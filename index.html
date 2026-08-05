@@ -1,0 +1,1833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClickPay Pro - Ultimate Task Hub & Digital Ecosystem</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            --bg-color: #030712;
+            --card-bg: #0b1329;
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --text-light: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #1e293b;
+            --accent: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --glow: rgba(59, 130, 246, 0.25);
+            --gradient-main: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            --glass-bg: rgba(11, 19, 41, 0.85);
+        }
+
+        body.business-theme {
+            --bg-color: #09090b;
+            --card-bg: #121215;
+            --primary: #f59e0b;
+            --primary-hover: #d97706;
+            --border: #27272a;
+            --accent: #3b82f6;
+            --glow: rgba(245, 158, 11, 0.25);
+            --gradient-main: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+            --glass-bg: rgba(18, 18, 21, 0.85);
+        }
+
+        body.worker-theme {
+            --bg-color: #05050f;
+            --card-bg: #0e1124;
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --border: #1e2238;
+            --accent: #10b981;
+            --glow: rgba(99, 102, 241, 0.35);
+            --gradient-main: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+            --glass-bg: rgba(14, 17, 36, 0.92);
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-light);
+            padding-bottom: 110px;
+            transition: background-color 0.4s ease;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* ULTRA-FUTURISTIC CINEMATIC INTRO SCREEN */
+        #intro-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at center, #0f172a 0%, #030712 100%);
+            z-index: 99999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 24px;
+            animation: cinematicFadeOut 0.6s cubic-bezier(0.16, 1, 0.3, 1) 3.2s forwards;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        @keyframes cinematicFadeOut {
+            to { opacity: 0; visibility: hidden; transform: scale(1.05); filter: blur(10px); }
+        }
+        .intro-laser-grid {
+            position: absolute;
+            width: 200%; height: 200%;
+            background-image: linear-gradient(rgba(59, 130, 246, 0.05) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(59, 130, 246, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            animation: gridMove 20s linear infinite;
+        }
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(40px, 40px); }
+        }
+        .intro-logo-box {
+            font-size: 38px;
+            font-weight: 900;
+            background: var(--gradient-main);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            animation: holoPulse 1.5s cubic-bezier(0.16, 1, 0.3, 1) infinite alternate;
+            z-index: 2;
+        }
+        @keyframes holoPulse {
+            0% { transform: scale(0.92); filter: drop-shadow(0 0 10px rgba(59,130,246,0.4)); }
+            100% { transform: scale(1.08); filter: drop-shadow(0 0 40px rgba(99,102,241,0.8)); }
+        }
+        .intro-subtitle {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 14px;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            font-weight: 900;
+            z-index: 2;
+        }
+        .intro-loader-bar {
+            width: 180px;
+            height: 3px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            margin-top: 24px;
+            overflow: hidden;
+            z-index: 2;
+        }
+        .intro-loader-progress {
+            width: 0%;
+            height: 100%;
+            background: var(--gradient-main);
+            animation: loadProgress 3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes loadProgress {
+            to { width: 100%; }
+        }
+
+        header {
+            background: var(--glass-bg);
+            padding: 14px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+
+        header h1 { 
+            font-size: 14px; 
+            color: var(--primary); 
+            font-weight: 900; 
+            text-transform: uppercase; 
+            letter-spacing: 1.2px; 
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        header h1 span.sub-brand {
+            font-size: 8px;
+            color: var(--text-muted);
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: none;
+        }
+
+        .container { max-width: 600px; margin: 16px auto; padding: 0 14px; }
+        .section { display: none; animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
+        .section.active { display: block; }
+
+        @keyframes fadeIn { 
+            from { opacity: 0; transform: translateY(10px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+
+        .section-title {
+            font-size: 13px;
+            margin-bottom: 14px;
+            color: var(--primary);
+            font-weight: 800;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.25s, box-shadow 0.25s;
+            position: relative;
+            overflow: hidden;
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 4px; height: 100%;
+            background: var(--primary);
+            opacity: 0;
+            transition: opacity 0.25s;
+        }
+        .card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 15px 35px var(--glow);
+            transform: translateY(-2px);
+        }
+        .card:hover::before { opacity: 1; }
+
+        .action-btn {
+            background: var(--gradient-main);
+            color: #ffffff;
+            border: none;
+            padding: 13px 20px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 0 6px 20px var(--glow);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .action-btn:hover { filter: brightness(1.1); transform: translateY(-2px); box-shadow: 0 8px 25px var(--glow); }
+        .action-btn:active { transform: scale(0.97); }
+        .action-btn.secondary { background: var(--border); color: var(--text-light); border: 1px solid rgba(255,255,255,0.08); box-shadow: none; }
+        .action-btn.secondary:hover { background: #334155; }
+        .action-btn.danger { background: var(--danger); box-shadow: 0 6px 20px rgba(239, 68, 68, 0.3); }
+        .action-btn:disabled { background: #1e293b; color: #475569; cursor: not-allowed; transform: none; box-shadow: none; filter: none; }
+
+        .box {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 24px;
+            margin-top: 16px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+        }
+
+        .form-group { margin-bottom: 16px; }
+        label { display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 6px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; }
+        input, select, textarea {
+            width: 100%;
+            padding: 13px 16px;
+            background: rgba(0, 0, 0, 0.45);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: white;
+            font-size: 13px;
+            transition: all 0.25s;
+        }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px var(--glow); background: rgba(0,0,0,0.6); }
+
+        .inline-alert { background: rgba(239, 68, 68, 0.15); border: 1px solid var(--danger); color: #fca5a5; padding: 12px; border-radius: 12px; font-size: 11px; margin-top: 12px; text-align: center; font-weight: bold; display: none; }
+        .inline-success { background: rgba(16, 185, 129, 0.15); border: 1px solid #10b981; color: #6ee7b7; padding: 12px; border-radius: 12px; font-size: 11px; margin-top: 12px; text-align: center; font-weight: bold; display: none; }
+
+        .notice-board {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(168, 85, 247, 0.08));
+            border: 1px solid var(--primary);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 18px;
+            box-shadow: 0 8px 25px var(--glow);
+            position: relative;
+            overflow: hidden;
+        }
+        .notice-board::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 3px;
+            background: var(--gradient-main);
+        }
+        .notice-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 11px;
+            font-weight: 900;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .notice-content {
+            font-size: 12px;
+            line-height: 1.6;
+            color: var(--text-light);
+            font-weight: 600;
+        }
+
+        .wallet-card {
+            background: linear-gradient(135deg, #0d122b, #1b2245, #080c1e);
+            border: 1px solid var(--primary);
+            border-radius: 24px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 20px 50px rgba(99,102,241,0.25);
+            position: relative;
+            overflow: hidden;
+        }
+        .wallet-card::before {
+            content: '';
+            position: absolute;
+            top: -70px; right: -70px;
+            width: 160px; height: 160px;
+            background: var(--primary);
+            opacity: 0.25;
+            border-radius: 50%;
+            filter: blur(35px);
+        }
+        .wallet-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .wallet-chip { width: 42px; height: 30px; background: linear-gradient(135deg, #a855f7, #6366f1); border-radius: 6px; box-shadow: 0 3px 12px rgba(168,85,247,0.5); }
+        .wallet-balances { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; text-align: center; background: rgba(0,0,0,0.55); padding: 14px; border-radius: 16px; border: 1px solid var(--border); margin-bottom: 16px; }
+        .wallet-bal-box h4 { font-size: 9px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.6px; }
+        .wallet-bal-box div { font-size: 14px; font-weight: 900; color: var(--primary); }
+
+        .gateway-chooser {
+            background: radial-gradient(circle at center, rgba(99,102,241,0.15) 0%, rgba(5,7,18,0.98) 100%);
+            border: 1px solid var(--border);
+            border-radius: 26px;
+            padding: 32px 20px;
+            text-align: center;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.7);
+        }
+        .role-choice-btn {
+            border-radius: 18px;
+            padding: 22px;
+            margin: 14px 0;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+        }
+        .role-choice-worker {
+            background: linear-gradient(135deg, #0e1124, rgba(99,102,241,0.15));
+            border: 2px solid #6366f1;
+        }
+        .role-choice-worker:hover {
+            border-color: #818cf8;
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(99,102,241,0.35);
+        }
+        .role-choice-business {
+            background: linear-gradient(135deg, #121215, rgba(245,158,11,0.15));
+            border: 2px solid #f59e0b;
+        }
+        .role-choice-business:hover {
+            border-color: #fbbf24;
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(245,158,11,0.35);
+        }
+        .role-choice-btn h3 { font-size: 16px; color: var(--text-light); font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* PROMO ECOSYSTEM BAR: ICONS ONLY HORIZONTAL */
+        .promo-badge-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(59, 130, 246, 0.2));
+            border: 1px solid var(--accent);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 900;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);
+        }
+
+        .promo-ecosystem-bar {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 10px 14px;
+            margin-top: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+        .promo-ecosystem-title {
+            font-size: 9px;
+            font-weight: 900;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            white-space: nowrap;
+        }
+        .promo-icons-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .promo-icon-badge {
+            font-size: 14px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 30px; height: 30px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* DURATION BUTTONS GRID */
+        .duration-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-top: 6px;
+            margin-bottom: 12px;
+        }
+        .duration-btn {
+            background: rgba(0,0,0,0.5);
+            border: 1px solid var(--border);
+            color: var(--text-light);
+            padding: 10px 6px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 900;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        .duration-btn:hover { border-color: var(--primary); }
+        .duration-btn.active {
+            background: var(--gradient-main);
+            border-color: transparent;
+            color: #fff;
+            box-shadow: 0 4px 15px var(--glow);
+        }
+
+        .nav-bar {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background: var(--glass-bg);
+            border-top: 1px solid var(--border);
+            display: flex; justify-content: space-around;
+            padding: 10px 8px 16px; z-index: 1000;
+            box-shadow: 0 -15px 35px rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .nav-item {
+            background: none; border: none; color: var(--text-muted);
+            font-size: 10px; font-weight: 700; cursor: pointer;
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+            padding: 8px; border-radius: 12px; flex: 1; transition: all 0.2s;
+            text-decoration: none;
+        }
+        .nav-item span:first-child { font-size: 22px; }
+        .nav-item.active { color: var(--primary); font-weight: 900; background: var(--glow); }
+
+        .toast {
+            position: fixed; top: 24px; left: 50%; transform: translateX(-50%) translateY(-30px);
+            background: rgba(15, 23, 42, 0.98); color: white; padding: 14px 26px; border-radius: 14px;
+            border: 1px solid var(--primary); font-size: 12px; font-weight: 800; z-index: 2000;
+            opacity: 0; transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1); pointer-events: none;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.8);
+        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        
+        .footer-copyright {
+            text-align: center;
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-top: 24px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body class="worker-theme">
+
+    <!-- ULTRA-FUTURISTIC CINEMATIC INTRO SCREEN -->
+    <div id="intro-screen">
+        <div class="intro-laser-grid"></div>
+        <div class="intro-logo-box">ClickPay Pro</div>
+        <div class="intro-subtitle">Ultimate Task Hub & Digital Ecosystem</div>
+        <div class="intro-loader-bar">
+            <div class="intro-loader-progress"></div>
+        </div>
+    </div>
+
+    <header>
+        <h1>
+            ⚡ CLICKPAY PRO HUB
+            <span class="sub-brand">Launched by ClickPay Digital</span>
+        </h1>
+        <div style="display:flex; gap:10px; align-items:center;">
+            <a href="https://t.me/ZEROPLUSFOR" target="_blank" style="font-size:10px; background:var(--gradient-main); color:#fff; padding:7px 14px; border-radius:9px; font-weight:800; text-decoration:none; box-shadow: 0 4px 15px var(--glow);">💬 Support</a>
+        </div>
+    </header>
+
+    <div id="appToast" class="toast">Message</div>
+
+    <div class="container">
+
+        <!-- NOTICE BOARD -->
+        <div class="notice-board" id="globalNoticeBoard">
+            <div class="notice-header">
+                <span>📢 Live ClickPay Notice Board</span>
+                <span style="font-size: 9px; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px;" id="noticeSyncTime">Live Sync</span>
+            </div>
+            <div class="notice-content" id="noticeBoardContent">Loading official announcements & updates...</div>
+        </div>
+
+        <!-- 0. ROLE SELECT & GATEWAY -->
+        <div id="gateway-section" class="section active">
+            <div class="gateway-chooser">
+                <div style="font-size: 22px; font-weight: 900; color: var(--primary); margin-bottom: 8px; letter-spacing: 0.5px;">WELCOME TO CLICKPAY PRO</div>
+                <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 26px; line-height: 1.6;">
+                    Select your platform role to proceed and start earning or growing your digital empire.
+                </div>
+
+                <div class="role-choice-btn role-choice-worker" onclick="selectRoleIntent('Worker')">
+                    <h3>Worker</h3>
+                </div>
+
+                <div class="role-choice-btn role-choice-business" onclick="selectRoleIntent('Business Owner')">
+                    <h3>Business Owner</h3>
+                </div>
+
+                <div class="footer-copyright">
+                    © 2026 ClickPay Pro. All Rights Reserved.
+                </div>
+            </div>
+        </div>
+
+        <!-- CHANNEL & BOT JOIN GATEWAY -->
+        <div id="channel-gate-section" class="section">
+            <div class="box" style="border: 1px solid var(--primary); text-align: center;">
+                <h3 style="color: var(--primary); margin-bottom: 12px; font-size: 16px;" id="gateTitle">📢 Mandatory Telegram Gateway</h3>
+                <div style="font-size: 12px; line-height: 1.6; color: var(--text-muted); margin-bottom: 24px;" id="gateInstructionText">
+                    Mandatory requirement! Please join our official channels and start our official bot before registration.
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 12px;" id="gateButtonsContainer"></div>
+                <div id="gateAlert" class="inline-alert">⚠️ Please complete all mandatory gateway requirements!</div>
+            </div>
+            <div class="footer-copyright">
+                © 2026 ClickPay Pro. All Rights Reserved.
+            </div>
+        </div>
+
+        <!-- 1. REGISTRATION WITH STRICT VALIDATION -->
+        <div id="auth-section" class="section">
+            <div class="box">
+                <div class="section-title"><span id="regTitleHeading">🔐 Registration</span></div>
+                
+                <div class="form-group"><label>Full Name</label><input type="text" id="regFullName" placeholder="Enter your full name..."></div>
+                
+                <div class="form-group" id="regBizNameGroup" style="display:none;">
+                    <label>Business / Brand Name</label>
+                    <input type="text" id="regBizName" placeholder="Enter business or brand name...">
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div class="form-group">
+                        <label>Age (እድሜ)</label>
+                        <input type="number" id="regAge" placeholder="24" min="13" max="99">
+                    </div>
+                    <div class="form-group">
+                        <label>Gender (ፆታ)</label>
+                        <select id="regGender">
+                            <option value="">Select Gender</option>
+                            <option value="Male">Male (ወንድ)</option>
+                            <option value="Female">Female (ሴት)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group"><label>Email Address</label><input type="email" id="regEmail" placeholder="example@gmail.com"></div>
+                <div class="form-group"><label>Phone Number</label><input type="text" id="regPhone" placeholder="09xxxxxxxx"></div>
+                <div class="form-group"><label>Telegram Username</label><input type="text" id="regTgUser" placeholder="@username"></div>
+                
+                <button class="action-btn" style="width:100%; padding:15px; margin-top:14px;" onclick="handleUserRegistration()">Register & Launch App</button>
+                <div id="authAlertBox" class="inline-alert">Please fill in ALL required fields correctly (Valid Email & Phone) before proceeding!</div>
+            </div>
+            <div class="footer-copyright">
+                © 2026 ClickPay Pro. All Rights Reserved.
+            </div>
+        </div>
+
+        <!-- 2. BUSINESS DASHBOARD -->
+        <div id="business-dashboard" class="section">
+            <div style="font-size: 13px; font-weight: bold; color: var(--primary); margin-bottom: 16px; background: rgba(0,0,0,0.5); padding: 16px; border-radius: 16px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; box-shadow: 0 6px 20px rgba(0,0,0,0.4);">
+                <span>💼 <span id="dashBusinessFullName" style="color: #fff; font-weight: 900;">--</span></span>
+                <span style="font-size: 10px; background: var(--gradient-main); color: #fff; padding: 4px 10px; border-radius: 8px; font-weight:900; letter-spacing: 0.8px;">BUSINESS PARTNER</span>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; margin: 16px 0; background: rgba(0,0,0,0.4); border-radius: 16px; padding: 6px; border: 1px solid var(--border);">
+              <button onclick="switchBizTab('tasks')" id="biz-tasks-tab-btn" style="flex: 1; padding: 12px; border: none; background: var(--primary); color: #fff; border-radius: 12px; font-weight: 900; font-size: 12px; cursor: pointer; transition: all 0.2s;">📋 Network Tasks</button>
+              <button onclick="switchBizTab('promos')" id="biz-promos-tab-btn" style="flex: 1; padding: 12px; border: none; background: transparent; color: var(--text-light); border-radius: 12px; font-weight: 900; font-size: 12px; cursor: pointer; transition: all 0.2s;">🌟 Promotions</button>
+            </div>
+
+            <div id="biz-tasks-wrap">
+                <div class="section-title"><span>📋 Active Ecosystem Tasks</span></div>
+                <div id="business-tasks-container">Loading tasks...</div>
+            </div>
+
+            <div id="biz-promos-wrap" style="display: none;">
+                <div class="section-title"><span>🌟 Professional Promotions Feed</span></div>
+                <div id="business-promos-container">Loading promotions...</div>
+            </div>
+            <div class="footer-copyright">
+                © 2026 ClickPay Pro. All Rights Reserved.
+            </div>
+        </div>
+
+        <!-- BUSINESS PROFILE TAB -->
+        <div id="business-profile-section" class="section">
+            <div class="section-title"><span>💼 Business Partner Profile</span></div>
+            <div class="box">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <div style="font-size: 40px; margin-bottom: 8px;">👑</div>
+                    <div style="font-size: 16px; font-weight: 900; color: #fff;" id="profBizName">--</div>
+                    <div style="font-size: 11px; color: var(--primary); font-weight: 800; margin-top: 4px;">Verified Enterprise Partner</div>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 12px; font-size: 12px;">
+                    <div style="display: flex; justify-content: space-between; background: rgba(0,0,0,0.4); padding: 12px; border-radius: 10px; border: 1px solid var(--border);">
+                        <span style="color: var(--text-muted);">Full Name:</span>
+                        <span style="font-weight: bold; color: #fff;" id="profFullName">--</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; background: rgba(0,0,0,0.4); padding: 12px; border-radius: 10px; border: 1px solid var(--border);">
+                        <span style="color: var(--text-muted);">Age & Gender:</span>
+                        <span style="font-weight: bold; color: #fff;" id="profAgeGender">--</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; background: rgba(0,0,0,0.4); padding: 12px; border-radius: 10px; border: 1px solid var(--border);">
+                        <span style="color: var(--text-muted);">Email Address:</span>
+                        <span style="font-weight: bold; color: #fff;" id="profEmail">--</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; background: rgba(0,0,0,0.4); padding: 12px; border-radius: 10px; border: 1px solid var(--border);">
+                        <span style="color: var(--text-muted);">Phone Number:</span>
+                        <span style="font-weight: bold; color: #fff;" id="profPhone">--</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; background: rgba(0,0,0,0.4); padding: 12px; border-radius: 10px; border: 1px solid var(--border);">
+                        <span style="color: var(--text-muted);">Telegram Username:</span>
+                        <span style="font-weight: bold; color: #fff;" id="profTg">--</span>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-copyright">
+                © 2026 ClickPay Pro. All Rights Reserved.
+            </div>
+        </div>
+
+        <!-- BUSINESS MY ADS TAB -->
+        <div id="business-my-ads-section" class="section">
+            <div class="section-title"><span>📢 My Submitted Campaigns (My Ads)</span></div>
+            <div id="businessMyAdsContainer">
+                <div class="card" style="text-align: center; color: var(--text-muted); font-size: 12px; padding: 24px;">
+                    No campaigns submitted yet. Post an ad to track your active campaigns here!
+                </div>
+            </div>
+            <div class="footer-copyright">
+                © 2026 ClickPay Pro. All Rights Reserved.
+            </div>
+        </div>
+
+        <!-- 3. WORKER DASHBOARD & WALLET -->
+        <div id="worker-dashboard" class="section">
+            <div style="font-size: 13px; font-weight: bold; color: var(--primary); margin-bottom: 16px; background: rgba(14, 17, 36, 0.9); padding: 16px; border-radius: 18px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 30px rgba(99,102,241,0.2);">
+                <span>👷 <span id="dashWorkerFullName" style="color: #fff; font-weight: 900;">--</span></span>
+                <span style="font-size: 10px; background: var(--gradient-main); color: #fff; padding: 5px 12px; border-radius: 10px; font-weight:900; letter-spacing: 0.8px; box-shadow: 0 4px 15px var(--glow);">WORKER HUB</span>
+            </div>
+            
+            <div class="wallet-card">
+                <div class="wallet-header">
+                    <div>
+                        <div style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 800;">ClickPay Secure Wallet</div>
+                        <div style="font-size: 17px; font-weight: 900; color: #fff; margin-top: 2px;" id="walletWorkerName">--</div>
+                    </div>
+                    <div class="wallet-chip"></div>
+                </div>
+
+                <div class="wallet-balances">
+                    <div class="wallet-bal-box">
+                        <h4>Points</h4>
+                        <div id="wCardPoints">0 Pts</div>
+                    </div>
+                    <div class="wallet-bal-box">
+                        <h4>ETB Balance</h4>
+                        <div id="wCardEtb">0.00 Br</div>
+                    </div>
+                    <div class="wallet-bal-box">
+                        <h4>USD Value</h4>
+                        <div id="wCardUsd">$0.00</div>
+                    </div>
+                </div>
+
+                <div style="font-size: 10px; color: var(--text-muted); display: flex; justify-content: space-between; font-weight: 700;">
+                    <span>@<span id="walletTgUser">username</span></span>
+                    <span>Joined: <span id="walletRegDate">--</span></span>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; margin: 16px 0; background: rgba(0,0,0,0.4); border-radius: 16px; padding: 6px; border: 1px solid var(--border);">
+              <button onclick="switchWorkerTab('tasks')" id="worker-tasks-tab-btn" style="flex: 1; padding: 12px; border: none; background: var(--primary); color: #fff; border-radius: 12px; font-weight: 900; font-size: 12px; cursor: pointer; transition: all 0.2s;">📋 Micro-Tasks</button>
+              <button onclick="switchWorkerTab('promos')" id="worker-promos-tab-btn" style="flex: 1; padding: 12px; border: none; background: transparent; color: var(--text-light); border-radius: 12px; font-weight: 900; font-size: 12px; cursor: pointer; transition: all 0.2s;">🌟 Promotions</button>
+            </div>
+
+            <div id="worker-tasks-wrap">
+                <div class="section-title"><span>📋 Available Micro-Tasks</span></div>
+                <div id="worker-dynamic-tasks-container">Loading tasks...</div>
+            </div>
+
+            <div id="worker-promos-wrap" style="display: none;">
+                <div class="section-title"><span>🌟 Exclusive Promotions</span></div>
+                <div id="worker-promotions-container">Loading promos...</div>
+            </div>
+            <div class="footer-copyright">
+                © 2026 ClickPay Pro. All Rights Reserved.
+            </div>
+        </div>
+
+        <!-- WORKER PROFILE TAB -->
+        <div id="worker-profile-section" class="section">
+            <div class="section-title"><span>👷 Worker Profile & Referral Hub</span></div>
+            <div class="box">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <div style="font-size: 40px; margin-bottom: 8px;">👤</div>
+                    <div style="font-size: 16px; font-weight: 900; color: #fff;" id="workerProfName">--</div>
+                    <div style="font-size: 11px; color: var(--primary); font-weight: 800; margin-top: 4px;">Verified Ecosystem Worker</div>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 12px; font-size: 12px; margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; background: rgba(0,0,0,0.4); padding: 12px; border-radius: 10px; border: 1px solid var(--border);">
+                        <span style="color: var(--text-muted);">Age & Gender:</span>
+                        <span style="font-weight: bold; color: #fff;" id="workerProfAgeGender">--</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; background: rgba(0,0,0,0.4); padding: 12px; border-radius: 10px; border: 1px solid var(--border);">
+                        <span style="color: var(--text-muted);">Email Address:</span>
+                        <span style="font-weight: bold; color: #fff;" id="workerProfEmail">--</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; background: rgba(0,0,0,0.4); padding: 12px; border-radius: 10px; border: 1px solid var(--border);">
+                        <span style="color: var(--text-muted);">Phone Number:</span>
+                        <span style="font-weight: bold; color: #fff;" id="workerProfPhone">--</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; background: rgba(0,0,0,0.4); padding: 12px; border-radius: 10px; border: 1px solid var(--border);">
+                        <span style="color: var(--text-muted);">Telegram Username:</span>
+                        <span style="font-weight: bold; color: #fff;" id="workerProfTg">--</span>
+                    </div>
+                </div>
+
+                <div style="border-top: 1px solid var(--border); padding-top: 18px; text-align: center;">
+                    <h3 style="color: var(--primary); font-size: 14px; margin-bottom: 6px;">🎁 Referral Program</h3>
+                    <p style="font-size: 11px; color: var(--text-muted); line-height: 1.5; margin-bottom: 14px;">
+                        Invite friends and earn points instantly!
+                    </p>
+                    <div class="form-group">
+                        <input type="text" id="workerRefLinkInput" readonly style="text-align: center; font-weight: bold; color: var(--accent);">
+                    </div>
+                    <button class="action-btn" style="width: 100%; margin-top: 6px;" onclick="copyWorkerReferralLink()">📋 Copy Referral Link</button>
+                </div>
+            </div>
+            <div class="footer-copyright">
+                © 2026 ClickPay Pro. All Rights Reserved.
+            </div>
+        </div>
+
+        <!-- 4. WORKER WITHDRAW SECTION -->
+        <div id="withdraw-section" class="section">
+            <div class="section-title"><span>💸 Earnings Withdrawal (Sunday Only)</span></div>
+            
+            <div class="box" style="margin-top:0;">
+                <div style="text-align: center; margin-bottom: 20px; background: rgba(0,0,0,0.4); padding: 18px; border-radius: 16px; border: 1px solid var(--border);">
+                    <div style="font-size: 11px; color: var(--text-muted); font-weight: 800; text-transform: uppercase;">Available Balance</div>
+                    <div style="font-size: 30px; font-weight: 900; color: var(--primary); margin-top: 4px;" id="wdAvailableBal">0.00 ETB</div>
+                </div>
+
+                <div class="form-group">
+                    <label>Select Payment Gateway</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 6px;" id="bankSelectorGrid">
+                        <button type="button" class="action-btn secondary bank-btn" onclick="selectBank('Telebirr', this)">Telebirr</button>
+                        <button type="button" class="action-btn secondary bank-btn" onclick="selectBank('CBE', this)">CBE Bank</button>
+                        <button type="button" class="action-btn secondary bank-btn" onclick="selectBank('Awash Bank', this)">Awash Bank</button>
+                        <button type="button" class="action-btn secondary bank-btn" onclick="selectBank('Dashen Bank', this)">Dashen Bank</button>
+                        <button type="button" class="action-btn secondary bank-btn" onclick="selectBank('Abyssinia Bank', this)">Abyssinia Bank</button>
+                        <button type="button" class="action-btn secondary bank-btn" onclick="selectBank('Coop Bank', this)">Coop Bank</button>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-top: 14px;"><label>Account Holder Name</label><input type="text" id="wdAccName" placeholder="Full name on bank account..."></div>
+                <div class="form-group"><label>Account / Phone Number</label><input type="text" id="wdAccNo" placeholder="Account or phone number..."></div>
+                <div class="form-group"><label>Amount (Min 500 ETB)</label><input type="number" id="wdAmount" placeholder="500"></div>
+                
+                <button class="action-btn" style="width:100%; padding:15px; margin-top:8px;" onclick="requestWithdrawal()">Submit Withdrawal Request</button>
+                <div id="wdAlertBox" class="inline-alert"></div>
+                <div id="wdSuccessBox" class="inline-success">Withdrawal request submitted successfully! Processing within 2 hours.</div>
+            </div>
+
+            <div class="box" style="margin-top: 18px; padding: 20px;">
+                <h4 style="color:var(--text-light); font-size:12px; margin-bottom:12px; border-bottom:1px solid var(--border); padding-bottom:8px; text-transform:uppercase; font-weight:900;">Withdrawal History</h4>
+                <div id="wdHistoryContainer"><div style="text-align:center; color:var(--text-muted); font-size:11px; padding:10px;">No history available.</div></div>
+            </div>
+            <div class="footer-copyright">
+                © 2026 ClickPay Pro. All Rights Reserved.
+            </div>
+        </div>
+
+        <!-- 5. BUSINESS SUBMIT AD SECTION -->
+        <div id="ad-submit-section" class="section">
+            <div class="section-title"><span>📢 Campaign Manager / Post Advertisement</span></div>
+            <div class="box" style="margin-top: 0;">
+                
+                <div class="form-group">
+                    <label>Select Campaign Type</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 6px;">
+                        <button type="button" id="typeBtnTask" class="action-btn" onclick="setCampaignType('task')">📋 Task Campaign</button>
+                        <button type="button" id="typeBtnPromo" class="action-btn secondary" onclick="setCampaignType('promo')">🌟 Promotion Ad</button>
+                    </div>
+                </div>
+
+                <div class="pro-form-box" style="background:rgba(0,0,0,0.4); padding:20px; border-radius:16px; border:1px dashed var(--primary); margin-top:16px;">
+                    <div class="form-group"><label>Full Name</label><input type="text" id="adFullName"></div>
+                    <div class="form-group"><label>Business / Brand Name</label><input type="text" id="adBizName"></div>
+                    <div class="form-group"><label>Headline / Professional Title (Bold)</label><input type="text" id="adHeadline" placeholder="Campaign title..."></div>
+                    <div class="form-group">
+                        <label>Description / Details (Max 25 Words)</label>
+                        <textarea id="adDesc" rows="3" placeholder="Detailed description of services or tasks (Max 25 words)..." oninput="checkWordCount(this)"></textarea>
+                        <div style="font-size:9px; color:var(--text-muted); text-align:right; margin-top:4px;" id="wordCountIndicator">0 / 25 words</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Platform</label>
+                        <select id="adSocialType">
+                            <option value="Telegram">Telegram Channel / Bot</option>
+                            <option value="YouTube">YouTube Video / Channel</option>
+                            <option value="TikTok">TikTok Video</option>
+                            <option value="AppDownload">Mobile App Download</option>
+                            <option value="Website">Official Website</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label>Target Link</label><input type="text" id="adLink" placeholder="https://..."></div>
+                    <div class="form-group"><label>Phone Number</label><input type="text" id="adPhone" placeholder="09xxxxxxxx"></div>
+                </div>
+
+                <div class="pro-form-box" style="background:rgba(0,0,0,0.4); padding:20px; border-radius:16px; border:1px solid var(--border); margin-bottom: 16px; margin-top: 16px;">
+                    <div id="taskTargetFields">
+                        <div class="form-group">
+                            <label>Target Strategy</label>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+                                <button type="button" id="stratPeopleBtn" class="action-btn" onclick="setTaskStrategy('people')">👥 የሰው ብዛት</button>
+                                <button type="button" id="stratDaysBtn" class="action-btn secondary" onclick="setTaskStrategy('days')">📅 የቀን ብዛት</button>
+                            </div>
+                            <input type="hidden" id="adTaskMode" value="people">
+                        </div>
+                    </div>
+
+                    <div id="promoTargetFields" style="display:none;">
+                        <div class="form-group">
+                            <label>Duration in Days (Min 7 days)</label>
+                            <div class="duration-grid" id="promoDurationGrid">
+                                <button type="button" class="duration-btn active" onclick="selectPromoDays(7, this)">7 Days</button>
+                                <button type="button" class="duration-btn" onclick="selectPromoDays(15, this)">15 Days</button>
+                                <button type="button" class="duration-btn" onclick="selectPromoDays(30, this)">30 Days</button>
+                                <button type="button" class="duration-btn" onclick="selectPromoDays(60, this)">60 Days</button>
+                            </div>
+                            <input type="number" id="adPromoDays" value="7" min="7" style="display:none;" oninput="calcAdPrice()">
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 12px;">
+                        <label id="targetAmountLabel">የሰው ብዛት</label>
+                        <input type="number" id="adTargetAmount" value="100" min="1" oninput="calcAdPrice()">
+                    </div>
+
+                    <div style="background: linear-gradient(45deg, rgba(245,158,11,0.15), rgba(245,158,11,0.05)); border: 1px solid var(--warning); padding: 16px; border-radius: 14px; text-align: center; margin-top: 16px;">
+                        <div style="font-size: 10px; font-weight: 900; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">Total Required Investment</div>
+                        <div style="font-size: 22px; font-weight: 900; color: var(--warning); margin-top: 4px;" id="adTotalCost">300 ETB</div>
+                    </div>
+                </div>
+
+                <button class="action-btn" style="width:100%; padding:16px; font-size:13px;" onclick="showAdPaymentArea()">Proceed to Secure Payment</button>
+
+                <div id="adPaymentArea" style="display:none; margin-top:20px; border-top:1px solid var(--border); padding-top:20px;">
+                    <div style="background: rgba(0,0,0,0.6); padding: 16px; border-radius: 14px; margin-bottom: 16px; border-left: 4px solid var(--primary); box-shadow: 0 6px 20px rgba(0,0,0,0.5);">
+                        <div style="font-size: 10px; color: var(--text-muted); font-weight: 800;">BANK TRANSFER DETAILS</div>
+                        <div style="font-size: 13px; font-weight: 900; color: #fff; margin-top: 2px;">🏦 Abyssinia Bank</div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin: 8px 0;">
+                            <div style="font-size: 18px; font-weight: 900; color: var(--primary); letter-spacing: 1.2px;" id="bankAccNoText">199288423</div>
+                            <button type="button" class="action-btn secondary" style="padding: 6px 12px; font-size: 10px;" onclick="copyBankAccountNumber()">📋 Copy Acc</button>
+                        </div>
+                        <div style="font-size: 11px; font-weight: 900; color: #fff;">👤 ABRHAME AMRO</div>
+                    </div>
+                    
+                    <div class="form-group"><label>Transaction ID / TRX Reference</label><input type="text" id="adTxId" placeholder="TRX..."></div>
+                    <button class="action-btn" style="width:100%; background: var(--accent); padding: 15px;" onclick="submitAdFinal()">Submit Campaign for Verification</button>
+                    <div id="adSuccess" class="inline-success">Campaign submitted successfully! Approval buttons sent to admin bot.</div>
+                    <div id="adError" class="inline-alert">Please enter a valid Transaction ID (TRX ID)!</div>
+                </div>
+            </div>
+            <div class="footer-copyright">
+                © 2026 ClickPay Pro. All Rights Reserved.
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Nav Bar -->
+    <nav class="nav-bar" id="mainNavBar" style="display:none;">
+        <button class="nav-item active" id="navHome" onclick="goBackToDashboard()">
+            <span>🏠</span><span>Home</span>
+        </button>
+        <button class="nav-item" id="navWithdrawWorker" style="display:none;" onclick="switchTab('withdraw-section'); updateHistoryUI();">
+            <span>💸</span><span>Withdraw</span>
+        </button>
+        <button class="nav-item" id="navProfileWorker" style="display:none;" onclick="switchTab('worker-profile-section'); renderWorkerProfileUI();">
+            <span>👤</span><span>Profile</span>
+        </button>
+        <button class="nav-item" id="navSubmitAd" style="display:none;" onclick="switchTab('ad-submit-section')">
+            <span>📢</span><span>Post Ad</span>
+        </button>
+        <button class="nav-item" id="navMyAdsBiz" style="display:none;" onclick="switchTab('business-my-ads-section'); renderMyAdsUI();">
+            <span>📁</span><span>My Ads</span>
+        </button>
+        <button class="nav-item" id="navProfileBiz" style="display:none;" onclick="switchTab('business-profile-section'); renderBusinessProfileUI();">
+            <span>👑</span><span>Profile</span>
+        </button>
+        <a class="nav-item" id="navContactAdmin" href="https://t.me/ZEROPLUSFOR" target="_blank">
+            <span>💬</span><span>Support</span>
+        </a>
+    </nav>
+
+    <script>
+        const BOT_TOKEN = "8210915532:AAFI3jyXgRLx_HXqdwRFOi1xtzVEJXKkAZQ";
+        const CHAT_ID = "6780786734";
+        
+        let deviceId = localStorage.getItem('clickpay_device_id_pro');
+        if(!deviceId) {
+            deviceId = 'DEV-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+            localStorage.setItem('clickpay_device_id_pro', deviceId);
+        }
+
+        let registeredUsers = JSON.parse(localStorage.getItem('clickpay_users_pro') || '{}');
+        let businessSubmittedAds = JSON.parse(localStorage.getItem('clickpay_biz_submitted_ads') || '[]');
+        let currentUser = null;
+        let selectedIntentRole = 'Worker';
+        let channelJoinedChecked = false;
+        let botStartedChecked = false;
+        let businessChannelJoinedChecked = false;
+        let selectedBankName = '';
+        let campaignCategory = 'task';
+
+        let taskStatesMap = {}; 
+        let taskTimeLeftMap = {};
+        let taskIntervalsMap = {};
+
+        const TASK_SHEET_URL = "https://docs.google.com/spreadsheets/d/1BZ4K_8kbMDp9_F_8W-j4AsDZsYKTIEODIn1lcxovBTc/export?format=csv&gid=2110496584";
+        const PROMOTION_SHEET_URL = "https://docs.google.com/spreadsheets/d/1BZ4K_8kbMDp9_F_8W-j4AsDZsYKTIEODIn1lcxovBTc/export?format=csv&gid=0";
+        const NOTICE_SHEET_URL = "https://docs.google.com/spreadsheets/d/1BZ4K_8kbMDp9_F_8W-j4AsDZsYKTIEODIn1lcxovBTc/export?format=csv&gid=2099439673";
+
+        let cachedTasksData = [];
+        let cachedPromosData = [];
+        let cachedNoticeText = "Welcome to ClickPay Pro Hub! Official ecosystem updates will appear here instantly.";
+
+        window.onload = function() {
+            let urlParams = new URLSearchParams(window.location.search);
+            let refUser = urlParams.get('ref');
+            if(refUser && !localStorage.getItem('clickpay_referred_flag')) {
+                localStorage.setItem('clickpay_referred_flag', refUser);
+            }
+
+            let existingUserId = localStorage.getItem('clickpay_device_reg_' + deviceId);
+            if (existingUserId && registeredUsers[existingUserId]) {
+                currentUser = registeredUsers[existingUserId];
+                openDashboardByRole();
+            } else {
+                switchTab('gateway-section');
+                document.getElementById('mainNavBar').style.display = 'none';
+            }
+            
+            setInterval(fetchLiveSheetsData, 1500);
+        };
+
+        function showToast(msg) {
+            let t = document.getElementById('appToast');
+            t.innerText = msg;
+            t.classList.add('show');
+            setTimeout(() => { t.classList.remove('show'); }, 3500);
+        }
+
+        function selectRoleIntent(role) {
+            let existingUserId = localStorage.getItem('clickpay_device_reg_' + deviceId);
+            if(existingUserId && registeredUsers[existingUserId]) {
+                showToast("⚠️ በአንድ ስልክ አንድ አካውንት ብቻ መክፈት ይቻላል!");
+                currentUser = registeredUsers[existingUserId];
+                openDashboardByRole();
+                return;
+            }
+
+            selectedIntentRole = role;
+            channelJoinedChecked = false;
+            botStartedChecked = false;
+            businessChannelJoinedChecked = false;
+
+            let gateTitle = document.getElementById('gateTitle');
+            let gateInstruction = document.getElementById('gateInstructionText');
+            let gateButtons = document.getElementById('gateButtonsContainer');
+
+            if(role === 'Worker') {
+                gateTitle.innerText = '📢 Worker Telegram Gateway';
+                gateInstruction.innerHTML = 'Mandatory requirement! Join our official Telegram channel and start the bot before registration.';
+                gateButtons.innerHTML = `
+                    <a href="https://t.me/click_Pay_official_Channel" target="_blank" class="action-btn secondary" onclick="markJoined('channel')">📢 1. Join Official Channel</a>
+                    <a href="https://t.me/CLIKPAY_BOT" target="_blank" class="action-btn secondary" onclick="markJoined('bot')">🤖 2. Start Telegram Bot</a>
+                    <button class="action-btn" style="width:100%; padding:15px; margin-top:8px;" onclick="proceedAfterGateway()">✅ Proceed to Registration</button>
+                `;
+            } else {
+                gateTitle.innerText = '📢 Business Partner Gateway';
+                gateInstruction.innerHTML = 'Business partners must join our official ClickPay Pro Business Channel before proceeding.';
+                gateButtons.innerHTML = `
+                    <a href="https://t.me/Click_Pay_Pro" target="_blank" class="action-btn secondary" onclick="markJoined('bizChannel')">📢 Join ClickPay Pro Channel</a>
+                    <button class="action-btn" style="width:100%; padding:15px; margin-top:8px;" onclick="proceedAfterGateway()">✅ Proceed to Registration</button>
+                `;
+            }
+            switchTab('channel-gate-section');
+        }
+
+        function markJoined(type) {
+            if(type === 'channel') channelJoinedChecked = true;
+            if(type === 'bot') botStartedChecked = true;
+            if(type === 'bizChannel') businessChannelJoinedChecked = true;
+        }
+
+        function proceedAfterGateway() {
+            if(selectedIntentRole === 'Worker' && (!channelJoinedChecked || !botStartedChecked)) {
+                let alertBox = document.getElementById('gateAlert');
+                alertBox.style.display = 'block';
+                setTimeout(() => { alertBox.style.display = 'none'; }, 4000);
+                return;
+            }
+            if(selectedIntentRole === 'Business Owner' && !businessChannelJoinedChecked) {
+                let alertBox = document.getElementById('gateAlert');
+                alertBox.innerText = "⚠️ Please join the official Business Channel (Click_Pay_Pro) first!";
+                alertBox.style.display = 'block';
+                setTimeout(() => { alertBox.style.display = 'none'; }, 4000);
+                return;
+            }
+            document.getElementById('regTitleHeading').innerText = selectedIntentRole === 'Worker' ? 'Worker Registration' : 'Business Owner Registration';
+            document.getElementById('regBizNameGroup').style.display = selectedIntentRole === 'Business Owner' ? 'block' : 'none';
+            
+            // Apply dynamic theme for auth form
+            if(selectedIntentRole === 'Business Owner') {
+                document.body.classList.add('business-theme');
+                document.body.classList.remove('worker-theme');
+            } else {
+                document.body.classList.add('worker-theme');
+                document.body.classList.remove('business-theme');
+            }
+            
+            switchTab('auth-section');
+        }
+
+        function handleUserRegistration() {
+            let existingUserId = localStorage.getItem('clickpay_device_reg_' + deviceId);
+            if (existingUserId && registeredUsers[existingUserId]) {
+                showToast("⚠️ በአንድ ስልክ አንድ አካውንት ብቻ መክፈት ይቻላል!");
+                currentUser = registeredUsers[existingUserId];
+                openDashboardByRole();
+                return;
+            }
+
+            let fullName = document.getElementById('regFullName').value.trim();
+            let age = document.getElementById('regAge').value.trim();
+            let gender = document.getElementById('regGender').value.trim();
+            let email = document.getElementById('regEmail').value.trim();
+            let phone = document.getElementById('regPhone').value.trim();
+            let tgUser = document.getElementById('regTgUser').value.trim();
+            let bizName = document.getElementById('regBizName').value.trim();
+
+            let emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            let phonePattern = /^[0-9]{9,13}$/;
+
+            if(!fullName || !age || !gender || !email || !phone || !tgUser || !emailPattern.test(email) || !phonePattern.test(phone) || (selectedIntentRole === 'Business Owner' && !bizName)) {
+                let ab = document.getElementById('authAlertBox');
+                ab.style.display = 'block';
+                setTimeout(()=> ab.style.display='none', 3500);
+                return;
+            }
+
+            let identifier = 'USER_' + Date.now();
+            currentUser = {
+                identifier, 
+                role: selectedIntentRole, 
+                fullName, 
+                age,
+                gender,
+                bizName: bizName || fullName, 
+                email, 
+                phone, 
+                tgUser,
+                points: 0, 
+                earningsBalance: 0.00, 
+                regDate: new Date().toLocaleDateString(),
+                completedTasks: {}, 
+                withdrawHistory: [],
+                referralCount: 0
+            };
+
+            let referredBy = localStorage.getItem('clickpay_referred_flag');
+            if(referredBy && registeredUsers[referredBy] && registeredUsers[referredBy].role === 'Worker') {
+                registeredUsers[referredBy].points = (registeredUsers[referredBy].points || 0) + 10;
+                registeredUsers[referredBy].referralCount = (registeredUsers[referredBy].referralCount || 0) + 1;
+            }
+
+            registeredUsers[identifier] = currentUser;
+            localStorage.setItem('clickpay_users_pro', JSON.stringify(registeredUsers));
+            localStorage.setItem('clickpay_device_reg_' + deviceId, identifier);
+            
+            sendToTelegramBotInstant(`🚀 <b>New Registration (${selectedIntentRole})!</b>\n\n👤 Name: ${fullName}\n🎂 Age: ${age} | Gender: ${gender}\n📱 Phone: ${phone}\n💬 TG: ${tgUser}`);
+            document.getElementById('mainNavBar').style.display = 'flex';
+            openDashboardByRole();
+        }
+
+        function applyTheme() {
+            if(!currentUser) return;
+            if(currentUser.role === 'Business Owner') {
+                document.body.classList.add('business-theme');
+                document.body.classList.remove('worker-theme');
+            } else {
+                document.body.classList.add('worker-theme');
+                document.body.classList.remove('business-theme');
+            }
+        }
+
+        function openDashboardByRole() {
+            if(!currentUser) { switchTab('gateway-section'); return; }
+            applyTheme();
+            document.getElementById('mainNavBar').style.display = 'flex';
+            
+            if(currentUser.role === 'Business Owner') {
+                switchTab('business-dashboard');
+                document.getElementById('navWithdrawWorker').style.display = 'none';
+                document.getElementById('navProfileWorker').style.display = 'none';
+                document.getElementById('navSubmitAd').style.display = 'flex';
+                document.getElementById('navMyAdsBiz').style.display = 'flex';
+                document.getElementById('navProfileBiz').style.display = 'flex';
+                document.getElementById('dashBusinessFullName').textContent = currentUser.bizName;
+                
+                document.getElementById('adFullName').value = currentUser.fullName;
+                document.getElementById('adBizName').value = currentUser.bizName;
+                document.getElementById('adPhone').value = currentUser.phone;
+            } else {
+                switchTab('worker-dashboard');
+                document.getElementById('navWithdrawWorker').style.display = 'flex';
+                document.getElementById('navProfileWorker').style.display = 'flex';
+                document.getElementById('navSubmitAd').style.display = 'none';
+                document.getElementById('navMyAdsBiz').style.display = 'none';
+                document.getElementById('navProfileBiz').style.display = 'none';
+                document.getElementById('dashWorkerFullName').textContent = currentUser.fullName;
+                updateWorkerWalletCard();
+            }
+            fetchLiveSheetsData();
+        }
+
+        function goBackToDashboard() {
+            if(!currentUser) return;
+            if(currentUser.role === 'Business Owner') switchTab('business-dashboard');
+            else switchTab('worker-dashboard');
+        }
+
+        function updateWorkerWalletCard() {
+            if(!currentUser) return;
+            let pts = currentUser.points || 0;
+            let etb = pts / 10;
+            let usd = etb / 57.0;
+
+            document.getElementById('walletWorkerName').textContent = currentUser.fullName;
+            document.getElementById('walletTgUser').textContent = currentUser.tgUser.replace('@','');
+            document.getElementById('walletRegDate').textContent = currentUser.regDate;
+            
+            document.getElementById('wCardPoints').textContent = pts + " Pts";
+            document.getElementById('wCardEtb').textContent = etb.toFixed(2) + " Br";
+            document.getElementById('wCardUsd').textContent = "$" + usd.toFixed(2);
+            document.getElementById('wdAvailableBal').textContent = etb.toFixed(2) + " ETB";
+        }
+
+        function renderWorkerProfileUI() {
+            if(!currentUser) return;
+            document.getElementById('workerProfName').textContent = currentUser.fullName;
+            document.getElementById('workerProfAgeGender').textContent = `${currentUser.age} yrs, ${currentUser.gender}`;
+            document.getElementById('workerProfEmail').textContent = currentUser.email;
+            document.getElementById('workerProfPhone').textContent = currentUser.phone;
+            document.getElementById('workerProfTg').textContent = currentUser.tgUser;
+
+            let botUsername = "CLIKPAY_BOT";
+            let refUrl = `https://t.me/${botUsername}?start=ref_${currentUser.identifier}`;
+            document.getElementById('workerRefLinkInput').value = refUrl;
+        }
+
+        function copyWorkerReferralLink() {
+            let input = document.getElementById('workerRefLinkInput');
+            input.select();
+            input.setSelectionRange(0, 99999);
+            navigator.clipboard.writeText(input.value);
+            showToast("📋 Referral link copied successfully!");
+        }
+
+        function renderBusinessProfileUI() {
+            if(!currentUser) return;
+            document.getElementById('profBizName').textContent = currentUser.bizName;
+            document.getElementById('profFullName').textContent = currentUser.fullName;
+            document.getElementById('profAgeGender').textContent = `${currentUser.age} yrs, ${currentUser.gender}`;
+            document.getElementById('profEmail').textContent = currentUser.email;
+            document.getElementById('profPhone').textContent = currentUser.phone;
+            document.getElementById('profTg').textContent = currentUser.tgUser;
+        }
+
+        function renderMyAdsUI() {
+            let container = document.getElementById('businessMyAdsContainer');
+            if(!container || !currentUser) return;
+            container.innerHTML = '';
+            
+            let userAds = businessSubmittedAds.filter(ad => ad.userIdentifier === currentUser.identifier);
+            if(userAds.length === 0) {
+                container.innerHTML = `
+                    <div class="card" style="text-align: center; color: var(--text-muted); font-size: 12px; padding: 24px;">
+                        No campaigns submitted yet. Post an ad to track your active campaigns here!
+                    </div>
+                `;
+                return;
+            }
+
+            userAds.forEach(ad => {
+                container.innerHTML += `
+                    <div class="card">
+                        <div style="font-size: 13px; font-weight: 900; color: var(--primary); margin-bottom: 6px;">📢 ${ad.title}</div>
+                        <div style="font-size: 11px; color: #e2e8f0; margin-bottom: 8px; font-weight: 600;">${ad.desc}</div>
+                        <div style="font-size: 10px; color: var(--text-muted); display:flex; flex-direction:column; gap:4px; margin-bottom:10px;">
+                            <div><b>Type:</b> ${ad.category.toUpperCase()} | <b>Platform:</b> ${ad.socialType}</div>
+                            <div><b>Target:</b> ${ad.targetInfo}</div>
+                            <div><b>Total Cost:</b> ${ad.totalCost} | <b>Date:</b> ${ad.date}</div>
+                        </div>
+                        <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid var(--accent); color: var(--accent); padding: 6px 12px; border-radius: 8px; font-size: 10px; font-weight: 900; text-align: center;">
+                            Status: Active & Verified
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function loadGoogleSheetCSV(sheetUrl, callback) {
+            fetch(sheetUrl).then(res => res.text()).then(csvText => {
+                const lines = csvText.split('\n').filter(l => l.trim() !== '');
+                if (lines.length < 1) return callback([]);
+                const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+                const result = [];
+                for (let i = 1; i < lines.length; i++) {
+                    const currentline = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+                    const obj = {};
+                    for (let j = 0; j < headers.length; j++) {
+                        let val = currentline[j] ? currentline[j].trim() : '';
+                        if (val.startsWith('"') && val.endsWith('"')) val = val.slice(1, -1);
+                        obj[headers[j]] = val;
+                    }
+                    result.push(obj);
+                }
+                callback(result);
+            }).catch(err => callback([]));
+        }
+
+        function fetchLiveSheetsData() {
+            loadGoogleSheetCSV(NOTICE_SHEET_URL, (data) => {
+                if(data && data.length > 0) {
+                    let latestNotice = data[data.length - 1].notice || data[data.length - 1].text || data[data.length - 1].announcement || Object.values(data[data.length - 1])[0];
+                    if(latestNotice) {
+                        cachedNoticeText = latestNotice;
+                        document.getElementById('noticeBoardContent').innerText = cachedNoticeText;
+                        document.getElementById('noticeSyncTime').innerText = "Live Synced: " + new Date().toLocaleTimeString();
+                    }
+                } else {
+                    document.getElementById('noticeBoardContent').innerText = "⚡ ClickPay Pro Notice Board Operational. Stay tuned for announcements!";
+                }
+            });
+
+            loadGoogleSheetCSV(TASK_SHEET_URL, (data) => {
+                if(data) {
+                    cachedTasksData = data;
+                    renderTasksUI();
+                }
+            });
+
+            loadGoogleSheetCSV(PROMOTION_SHEET_URL, (data) => {
+                if(data) {
+                    cachedPromosData = data;
+                    renderPromosUI();
+                }
+            });
+        }
+
+        function switchBizTab(tab) {
+            let tWrap = document.getElementById('biz-tasks-wrap');
+            let pWrap = document.getElementById('biz-promos-wrap');
+            let tBtn = document.getElementById('biz-tasks-tab-btn');
+            let pBtn = document.getElementById('biz-promos-tab-btn');
+            if(tab === 'tasks') {
+                tWrap.style.display='block'; pWrap.style.display='none';
+                tBtn.style.background='var(--primary)'; tBtn.style.color='#fff';
+                pBtn.style.background='transparent'; pBtn.style.color='var(--text-light)';
+            } else {
+                tWrap.style.display='none'; pWrap.style.display='block';
+                pBtn.style.background='var(--primary)'; pBtn.style.color='#fff';
+                tBtn.style.background='transparent'; tBtn.style.color='var(--text-light)';
+            }
+        }
+
+        function switchWorkerTab(tab) {
+            let tWrap = document.getElementById('worker-tasks-wrap');
+            let pWrap = document.getElementById('worker-promos-wrap');
+            let tBtn = document.getElementById('worker-tasks-tab-btn');
+            let pBtn = document.getElementById('worker-promos-tab-btn');
+            if(tab === 'tasks') {
+                tWrap.style.display='block'; pWrap.style.display='none';
+                tBtn.style.background='var(--primary)'; tBtn.style.color='#fff';
+                pBtn.style.background='transparent'; pBtn.style.color='var(--text-light)';
+            } else {
+                tWrap.style.display='none'; pWrap.style.display='block';
+                pBtn.style.background='var(--primary)'; pBtn.style.color='#fff';
+                tBtn.style.background='transparent'; tBtn.style.color='var(--text-light)';
+            }
+        }
+
+        function renderTasksUI() {
+            let bizTaskCont = document.getElementById('business-tasks-container');
+            let workerTaskCont = document.getElementById('worker-dynamic-tasks-container');
+            let reversed = [...cachedTasksData].reverse();
+
+            if(bizTaskCont && currentUser && currentUser.role === 'Business Owner') {
+                bizTaskCont.innerHTML = '';
+                reversed.forEach((task) => {
+                    let title = task.title || task.name || "Task Item";
+                    let link = task.link || "#";
+                    let brand = task.brand || task.bizname || "Partner Brand";
+                    bizTaskCont.innerHTML += `
+                        <div class="card">
+                            <div style="font-size:13px; font-weight:bold; margin-bottom:6px;">✅ ${title}</div>
+                            <div style="font-size:11px; color:var(--text-muted); margin-bottom:12px;">Brand: <b>${brand}</b></div>
+                            <a href="${link}" target="_blank" class="action-btn" style="width:100%; text-align:center; text-decoration:none;">Visit Task Link</a>
+                        </div>
+                    `;
+                });
+            }
+
+            if(workerTaskCont && currentUser && currentUser.role === 'Worker') {
+                workerTaskCont.innerHTML = '';
+                reversed.forEach((task, i) => {
+                    let originalIndex = cachedTasksData.length - 1 - i;
+                    let title = task.title || task.name || "Micro Task";
+                    let points = parseFloat(task.points) || 10;
+                    let etb = points / 10;
+                    let usd = etb / 57.0;
+                    let link = task.link || "#";
+                    let brand = task.brand || task.bizname || "Partner Network";
+                    let taskId = 'task_' + originalIndex + '_' + title.replace(/[^a-zA-Z0-9]/g,'');
+                    let isDone = currentUser.completedTasks && currentUser.completedTasks[taskId];
+
+                    if(isDone) {
+                        taskStatesMap[taskId] = 'completed';
+                    } else if(!taskStatesMap[taskId]) {
+                        taskStatesMap[taskId] = 'idle';
+                        taskTimeLeftMap[taskId] = 25;
+                    }
+
+                    workerTaskCont.innerHTML += `
+                        <div class="card" id="card-${taskId}">
+                            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+                                <div style="font-size:13px; font-weight:bold; color:var(--text-light);">${title}</div>
+                                <div style="font-size:10px; color:var(--primary); font-weight:bold; background:rgba(0,0,0,0.5); padding:4px 8px; border-radius:6px;">${brand}</div>
+                            </div>
+                            <div style="font-size:11px; color:var(--text-muted); margin-bottom:12px;">
+                                Reward: <b style="color:var(--accent);">${points} Pts</b> (${etb.toFixed(2)} ETB / $${usd.toFixed(2)})
+                            </div>
+                            
+                            <div id="action-area-${taskId}">
+                                ${getTaskButtonHTML(taskId, link, points)}
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+        }
+
+        function getTaskButtonHTML(taskId, link, points) {
+            let state = taskStatesMap[taskId] || 'idle';
+            let timeLeft = taskTimeLeftMap[taskId] ?? 25;
+
+            if (state === 'idle') {
+                return `<button onclick="handleOpenTask('${taskId}', '${link}')" class="action-btn" style="width:100%;">OPEN TASK</button>`;
+            } else if (state === 'counting') {
+                return `<button disabled class="action-btn" style="width:100%; background:#64748b; cursor:not-allowed;">WAIT ${timeLeft}s...</button>`;
+            } else if (state === 'ready') {
+                return `<button onclick="handleCollect('${taskId}', ${points})" class="action-btn" style="width:100%; background:var(--accent);">COLLECT REWARD</button>`;
+            } else {
+                return `<button disabled class="action-btn" style="width:100%; background:#1e3a8a; color:#cbd5e1;">TASK COMPLETED</button>`;
+            }
+        }
+
+        function handleOpenTask(taskId, link) {
+            window.open(link, '_blank');
+            taskStatesMap[taskId] = 'counting';
+            taskTimeLeftMap[taskId] = 25;
+            updateTaskButtonUI(taskId);
+
+            if(taskIntervalsMap[taskId]) clearInterval(taskIntervalsMap[taskId]);
+
+            taskIntervalsMap[taskId] = setInterval(() => {
+                if(taskTimeLeftMap[taskId] > 0) {
+                    taskTimeLeftMap[taskId]--;
+                    updateTaskButtonUI(taskId);
+                } else {
+                    taskStatesMap[taskId] = 'ready';
+                    clearInterval(taskIntervalsMap[taskId]);
+                    delete taskIntervalsMap[taskId];
+                    updateTaskButtonUI(taskId);
+                }
+            }, 1000);
+        }
+
+        function handleCollect(taskId, points) {
+            if(!currentUser.completedTasks) currentUser.completedTasks = {};
+            currentUser.completedTasks[taskId] = true;
+            currentUser.points = (currentUser.points || 0) + points;
+            
+            registeredUsers[currentUser.identifier] = currentUser;
+            localStorage.setItem('clickpay_users_pro', JSON.stringify(registeredUsers));
+            
+            taskStatesMap[taskId] = 'completed';
+            updateTaskButtonUI(taskId);
+            updateWorkerWalletCard();
+            showToast(`🎉 Successfully collected ${points} Pts!`);
+        }
+
+        function updateTaskButtonUI(taskId) {
+            let area = document.getElementById(`action-area-${taskId}`);
+            if(!area) return;
+            let link = "#";
+            let points = 10;
+            area.innerHTML = getTaskButtonHTML(taskId, link, points);
+        }
+
+        function renderPromosUI() {
+            let reversed = [...cachedPromosData].reverse();
+            const renderPromos = (elemId) => {
+                let el = document.getElementById(elemId);
+                if(!el) return;
+                el.innerHTML = '';
+                reversed.forEach((promo) => {
+                    let title = promo.title || promo.name || "Exclusive Promotion";
+                    let desc = promo.description || promo.details || "";
+                    let link = promo.link || "#";
+
+                    el.innerHTML += `
+                        <div class="card">
+                            <div class="promo-badge-pill">⭐ Promoted by ClickPay Pro</div>
+                            <h4 style="color:var(--primary); margin-bottom:6px; font-size:14px; font-weight:900;">${title}</h4>
+                            <p style="color:#e2e8f0; font-size:11px; line-height:1.6; margin-bottom:10px; font-weight:500;">${desc}</p>
+                            
+                            <div class="promo-ecosystem-bar">
+                                <div class="promo-ecosystem-title">Ecosystem</div>
+                                <div class="promo-icons-row">
+                                    <div class="promo-icon-badge">📢</div>
+                                    <div class="promo-icon-badge">▶️</div>
+                                    <div class="promo-icon-badge">🎵</div>
+                                    <div class="promo-icon-badge">📱</div>
+                                </div>
+                            </div>
+
+                            <a href="${link}" target="_blank" class="action-btn secondary" style="display:block; text-align:center; text-decoration:none; margin-top:12px;">Explore Promotion</a>
+                        </div>
+                    `;
+                });
+            };
+            if(currentUser && currentUser.role === 'Business Owner') renderPromos('business-promos-container');
+            if(currentUser && currentUser.role === 'Worker') renderPromos('worker-promotions-container');
+        }
+
+        function selectBank(bankName, btnElem) {
+            selectedBankName = bankName;
+            document.querySelectorAll('.bank-btn').forEach(b => b.style.borderColor = 'var(--border)');
+            btnElem.style.borderColor = 'var(--primary)';
+        }
+
+        function requestWithdrawal() {
+            let accName = document.getElementById('wdAccName').value.trim();
+            let accNo = document.getElementById('wdAccNo').value.trim();
+            let amount = parseFloat(document.getElementById('wdAmount').value);
+            
+            let alertBox = document.getElementById('wdAlertBox');
+            let successBox = document.getElementById('wdSuccessBox');
+            alertBox.style.display = 'none'; successBox.style.display = 'none';
+
+            const now = new Date();
+            const isSunday = now.getDay() === 0;
+            
+            if(!isSunday) {
+                alertBox.innerText = "⚠️ Withdrawals are permitted on Sundays only!";
+                alertBox.style.display = 'block'; return;
+            }
+            if(!selectedBankName || !accName || !accNo || !amount) {
+                alertBox.innerText = "⚠️ Please select a bank and fill all fields!";
+                alertBox.style.display = 'block'; return;
+            }
+            if(amount < 500) {
+                alertBox.innerText = "⚠️ Minimum withdrawal amount is 500 ETB!";
+                alertBox.style.display = 'block'; return;
+            }
+            let currentEtb = (currentUser.points || 0) / 10;
+            if(amount > currentEtb) {
+                alertBox.innerText = "⚠️ Insufficient balance! Complete more tasks to earn.";
+                alertBox.style.display = 'block'; return;
+            }
+
+            currentUser.points -= (amount * 10);
+            if(!currentUser.withdrawHistory) currentUser.withdrawHistory = [];
+            
+            let withdrawalTime = Date.now();
+            let newWithdrawalEntry = {
+                bank: selectedBankName, name: accName, account: accNo, amount,
+                time: withdrawalTime, status: 'Processing'
+            };
+            
+            currentUser.withdrawHistory.unshift(newWithdrawalEntry);
+            
+            registeredUsers[currentUser.identifier] = currentUser;
+            localStorage.setItem('clickpay_users_pro', JSON.stringify(registeredUsers));
+            
+            updateWorkerWalletCard();
+            updateHistoryUI();
+
+            setTimeout(() => {
+                let userRecord = registeredUsers[currentUser.identifier];
+                if(userRecord && userRecord.withdrawHistory) {
+                    let target = userRecord.withdrawHistory.find(w => w.time === withdrawalTime);
+                    if(target) {
+                        target.status = 'Success';
+                        registeredUsers[currentUser.identifier] = userRecord;
+                        localStorage.setItem('clickpay_users_pro', JSON.stringify(registeredUsers));
+                        updateHistoryUI();
+                    }
+                }
+            }, 7200000);
+            
+            let completedTasksCount = currentUser.completedTasks ? Object.keys(currentUser.completedTasks).length : 0;
+            let wdMsg = `💸 <b>አዲስ የገንዘብ ማውጣት (Withdrawal) ጥያቄ!</b>\n\n` +
+                        `👤 ሰራተኛ: ${currentUser.fullName}\n` +
+                        `💬 ቴሌግራም: ${currentUser.tgUser}\n` +
+                        `💰 የጠየቀው መጠን: ${amount} ETB\n` +
+                        `💳 አጠቃላይ ባላንስ: ${currentEtb.toFixed(2)} ETB\n` +
+                        `✅ የተጠናቀቁ ታስኮች ብዛት: ${completedTasksCount}\n` +
+                        `🏦 ባንክ: ${selectedBankName}\n` +
+                        `👤 አካውንት ስም: ${accName}\n` +
+                        `🔢 አካውንት ቁጥር: <code>${accNo}</code>\n\n` +
+                        `<i>Status: Processing (Auto-Success in 2 Hours)</i>`;
+            
+            sendToTelegramBotInstant(wdMsg);
+            
+            successBox.style.display = 'block';
+            document.getElementById('wdAccName').value = '';
+            document.getElementById('wdAccNo').value = '';
+            document.getElementById('wdAmount').value = '';
+            setTimeout(()=> successBox.style.display='none', 5000);
+        }
+
+        function updateHistoryUI() {
+            let cont = document.getElementById('wdHistoryContainer');
+            if(!cont || !currentUser) return;
+            cont.innerHTML = '';
+            let hist = currentUser.withdrawHistory || [];
+            if(hist.length === 0) {
+                cont.innerHTML = '<div style="text-align:center; color:var(--text-muted); font-size:11px; padding:10px;">No history available.</div>';
+                return;
+            }
+            
+            let now = Date.now();
+            hist.forEach((wd) => {
+                let elapsed = now - wd.time;
+                let displayStatus = elapsed >= 7200000 ? 'Success' : 'Processing';
+                if(wd.status !== displayStatus) {
+                    wd.status = displayStatus;
+                    registeredUsers[currentUser.identifier] = currentUser;
+                    localStorage.setItem('clickpay_users_pro', JSON.stringify(registeredUsers));
+                }
+
+                let isSuccess = wd.status === 'Success';
+                cont.innerHTML += `
+                    <div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--border); font-size:11px;">
+                        <div>
+                            <div style="font-weight:bold; color:var(--text-light);">${wd.amount} ETB</div>
+                            <div style="color:var(--text-muted); font-size:10px;">${wd.bank} • ${wd.account}</div>
+                        </div>
+                        <div style="text-align:right;">
+                            <div style="color:${isSuccess?'#10b981':'#f59e0b'}; font-weight:bold;">${wd.status}</div>
+                            <div style="color:var(--text-muted); font-size:9px;">${new Date(wd.time).toLocaleDateString()}</div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function checkWordCount(textarea) {
+            let words = textarea.value.trim().split(/\s+/).filter(Boolean);
+            let count = words.length;
+            let indicator = document.getElementById('wordCountIndicator');
+            indicator.innerText = `${count} / 25 words`;
+            if(count > 25) {
+                indicator.style.color = 'var(--danger)';
+            } else {
+                indicator.style.color = 'var(--text-muted)';
+            }
+        }
+
+        function copyBankAccountNumber() {
+            let accText = document.getElementById('bankAccNoText').innerText;
+            navigator.clipboard.writeText(accText);
+            showToast("📋 Bank account number copied!");
+        }
+
+        function setCampaignType(type) {
+            campaignCategory = type;
+            let tBtn = document.getElementById('typeBtnTask');
+            let pBtn = document.getElementById('typeBtnPromo');
+            let taskFields = document.getElementById('taskTargetFields');
+            let promoFields = document.getElementById('promoTargetFields');
+            
+            if(type === 'task') {
+                tBtn.className = 'action-btn';
+                pBtn.className = 'action-btn secondary';
+                taskFields.style.display = 'block';
+                promoFields.style.display = 'none';
+                document.getElementById('adTargetAmount').value = 100;
+            } else {
+                tBtn.className = 'action-btn secondary';
+                pBtn.className = 'action-btn';
+                taskFields.style.display = 'none';
+                promoFields.style.display = 'block';
+                document.getElementById('adPromoDays').value = 7;
+                document.getElementById('adTargetAmount').value = 7;
+            }
+            calcAdPrice();
+        }
+
+        function selectPromoDays(days, btnElem) {
+            document.querySelectorAll('#promoDurationGrid .duration-btn').forEach(b => b.classList.remove('active'));
+            btnElem.classList.add('active');
+            document.getElementById('adPromoDays').value = days;
+            document.getElementById('adTargetAmount').value = days;
+            calcAdPrice();
+        }
+
+        function setTaskStrategy(mode) {
+            document.getElementById('adTaskMode').value = mode;
+            let pBtn = document.getElementById('stratPeopleBtn');
+            let dBtn = document.getElementById('stratDaysBtn');
+            let label = document.getElementById('targetAmountLabel');
+            let targetInput = document.getElementById('adTargetAmount');
+            
+            if(mode === 'people') {
+                pBtn.className = 'action-btn';
+                dBtn.className = 'action-btn secondary';
+                label.innerText = 'የሰው ብዛት';
+                targetInput.value = 100;
+            } else {
+                pBtn.className = 'action-btn secondary';
+                dBtn.className = 'action-btn';
+                label.innerText = 'የቀን ብዛት (ሚን 3 ቀን)';
+                targetInput.value = 3;
+            }
+            calcAdPrice();
+        }
+
+        function calcAdPrice() {
+            let cost = 0;
+            if(campaignCategory === 'task') {
+                let mode = document.getElementById('adTaskMode').value;
+                let amt = parseInt(document.getElementById('adTargetAmount').value) || 0;
+                if(mode === 'days' && amt < 3) amt = 3;
+                cost = mode === 'people' ? amt * 3 : amt * 500;
+            } else {
+                let days = parseInt(document.getElementById('adPromoDays').value) || 7;
+                if(days < 7) days = 7;
+                cost = days * 500;
+                document.getElementById('adTargetAmount').value = days;
+            }
+            document.getElementById('adTotalCost').innerText = cost.toLocaleString() + ' ETB';
+        }
+
+        function showAdPaymentArea() {
+            let reqs = ['adFullName', 'adBizName', 'adHeadline', 'adDesc', 'adLink', 'adPhone'];
+            let valid = true;
+            reqs.forEach(id => {
+                if(!document.getElementById(id).value.trim()) valid = false;
+            });
+            
+            let descWords = document.getElementById('adDesc').value.trim().split(/\s+/).filter(Boolean).length;
+            if(descWords > 25) {
+                showToast("Description cannot exceed 25 words!");
+                return;
+            }
+
+            if(campaignCategory === 'promo') {
+                let days = parseInt(document.getElementById('adPromoDays').value) || 7;
+                if(days < 7) {
+                    showToast("Minimum promotion duration is 7 days!");
+                    return;
+                }
+            } else {
+                let mode = document.getElementById('adTaskMode').value;
+                if(mode === 'days') {
+                    let days = parseInt(document.getElementById('adTargetAmount').value) || 3;
+                    if(days < 3) {
+                        showToast("Minimum task days is 3 days!");
+                        return;
+                    }
+                }
+            }
+            if(!valid) {
+                showToast("Please fill all required campaign details first.");
+                return;
+            }
+            document.getElementById('adPaymentArea').style.display = 'block';
+            document.getElementById('adPaymentArea').scrollIntoView({behavior: "smooth"});
+        }
+
+        function submitAdFinal() {
+            let txId = document.getElementById('adTxId').value.trim();
+            if(!txId) {
+                document.getElementById('adError').style.display = 'block';
+                setTimeout(()=>document.getElementById('adError').style.display = 'none', 3000);
+                return;
+            }
+            
+            let fullName = document.getElementById('adFullName').value;
+            let bizName = document.getElementById('adBizName').value;
+            let title = document.getElementById('adHeadline').value;
+            let desc = document.getElementById('adDesc').value;
+            let link = document.getElementById('adLink').value;
+            let phone = document.getElementById('adPhone').value;
+            let totalCost = document.getElementById('adTotalCost').innerText;
+            let socialType = document.getElementById('adSocialType').value;
+            let targetInfo = campaignCategory === 'task' ? (document.getElementById('adTaskMode').value + ': ' + document.getElementById('adTargetAmount').value) : (document.getElementById('adPromoDays').value + ' Days');
+
+            let newAdObj = {
+                userIdentifier: currentUser.identifier,
+                category: campaignCategory,
+                title,
+                desc,
+                socialType,
+                link,
+                targetInfo,
+                totalCost,
+                date: new Date().toLocaleDateString()
+            };
+
+            businessSubmittedAds.unshift(newAdObj);
+            localStorage.setItem('clickpay_biz_submitted_ads', JSON.stringify(businessSubmittedAds));
+
+            let inlineKeyboard = {
+                inline_keyboard: [
+                    [
+                        { text: "✅ Approve & Post", callback_data: `approve_ad_${campaignCategory}_${encodeURIComponent(title)}_${encodeURIComponent(link)}` },
+                        { text: "❌ Decline / Reject", callback_data: `reject_ad_${txId}` }
+                    ]
+                ]
+            };
+
+            let msg = `📢 <b>አዲስ የካንፔን/ማስታወቂያ ጥያቄ (${campaignCategory.toUpperCase()})!</b>\n\n` +
+                      `👤 ስም: ${fullName}\n` +
+                      `💼 ብራንድ: ${bizName}\n` +
+                      `📌 ፕላትፎርም: ${socialType}\n` +
+                      `📝 ርዕስ: <b>${title}</b>\n` +
+                      `📄 ዝርዝር: ${desc}\n` +
+                      `🔗 ሊንክ: ${link}\n` +
+                      `📱 ስልክ: ${phone}\n` +
+                      `💰 ክፍያ: ${totalCost}\n` +
+                      `💳 TRX ID (ክፍያ ማረጋገጫ): <code>${txId}</code>\n\n` +
+                      `<i>👇 እባክዎ ከታች ያሉትን በተኖች በመጫን ማስታወቂያውን ይሁኑ ወይም ውድቅ ያድርጉ!</i>`;
+
+            sendToTelegramBotInstant(msg, inlineKeyboard);
+            
+            document.getElementById('adSuccess').style.display = 'block';
+            document.getElementById('adTxId').value = '';
+            setTimeout(() => {
+                document.getElementById('adSuccess').style.display = 'none';
+                document.getElementById('adPaymentArea').style.display = 'none';
+                goBackToDashboard();
+                showToast("ካንፔኑ በትክክል ወደ አድሚን ቦት ተልኳል! ክፍያው ሲረጋገጥ ፖስት ይደረጋል።");
+            }, 3000);
+        }
+
+        function switchTab(sectionId) {
+            document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+            let targetSec = document.getElementById(sectionId);
+            if(targetSec) targetSec.classList.add('active');
+            
+            document.querySelectorAll('.nav-item').forEach(nav => {
+                if(nav.id !== 'navContactAdmin') nav.classList.remove('active');
+            });
+            if(sectionId === 'business-dashboard' || sectionId === 'worker-dashboard') document.getElementById('navHome')?.classList.add('active');
+            else if(sectionId === 'withdraw-section') document.getElementById('navWithdrawWorker')?.classList.add('active');
+            else if(sectionId === 'worker-profile-section') document.getElementById('navProfileWorker')?.classList.add('active');
+            else if(sectionId === 'ad-submit-section') document.getElementById('navSubmitAd')?.classList.add('active');
+            else if(sectionId === 'business-my-ads-section') document.getElementById('navMyAdsBiz')?.classList.add('active');
+            else if(sectionId === 'business-profile-section') document.getElementById('navProfileBiz')?.classList.add('active');
+            
+            window.scrollTo(0, 0);
+        }
+
+        function sendToTelegramBotInstant(text, replyMarkup = null) {
+            let payload = { chat_id: CHAT_ID, text: text, parse_mode: "HTML" };
+            if(replyMarkup) payload.reply_markup = replyMarkup;
+            
+            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            }).catch(console.error);
+        }
+    </script>
+</body>
+</html>
